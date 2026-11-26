@@ -1,7 +1,7 @@
 name: Unzip Aurel
 on:
   push:
-    paths: ['aurel.zip']
+    paths: ['*.zip']
   workflow_dispatch:
 permissions:
   contents: write
@@ -11,8 +11,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: |
-          unzip -o aurel.zip
-          rm aurel.zip
+          unzip -o "*.zip"
+          rm -f ./*.zip
+          if [ -d aurel-pwa ]; then
+            cp -r aurel-pwa/. .
+            rm -rf aurel-pwa
+          fi
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git add -A
