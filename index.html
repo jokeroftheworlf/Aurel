@@ -189,6 +189,13 @@ details.sec .cl{padding:2px 0}
 .tbl{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}.tbl td,.tbl th{padding:7px 6px;text-align:right;border-bottom:1px solid var(--ln);white-space:nowrap}.tbl td:first-child,.tbl th:first-child{text-align:left}.tbl th{color:var(--mu);font-weight:500}
 .heat{display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,11px);gap:3px;overflow-x:auto;padding-bottom:4px}.heat i{width:11px;height:11px;border-radius:3px}
 .tl{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--ln)}
+.mdl{display:block;flex:none;filter:drop-shadow(0 3px 8px rgba(0,0,0,.35))}
+.ach{grid-template-columns:auto 1fr auto!important}.ach.lkd .mdl{filter:none}.ach.lkd{opacity:.82}
+.lvl{display:flex;align-items:center;gap:12px}
+.show span{padding:2px 12px 2px 2px!important;font-size:12.5px!important;background:rgba(255,255,255,.04)}
+.bars{display:flex;align-items:flex-end;gap:3px;height:70px;margin-top:6px}.bars div{flex:1;border-radius:4px 4px 0 0;background:linear-gradient(var(--ac),var(--ac2));min-height:3px;opacity:.9}
+.bl{display:flex;gap:3px;font-size:10px;color:var(--mu);margin-top:4px}.bl span{flex:1;text-align:center;white-space:nowrap;overflow:visible}
+.sg div small:first-child{display:block}.sg div b{margin:2px 0}
 </style>
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-192.png">
 </head>
@@ -1193,23 +1200,100 @@ function achCheck(){
 }
 document.body.insertAdjacentHTML('beforeend',"<aside class='sheet' id='sh-ac' aria-label='Achievements and statistics'><div class='sh'><h2>Progress</h2></div><div class='tabs' id='act'><button data-t='a' class='on'>Achievements</button><button data-t='s'>Statistics</button></div><div id='acx'></div></aside>");
 let acTab='a',acCat='All';
+const ICON={
+ cube:"<path d='M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z'/><path d='M12 12l8-4.5M12 12v9M12 12L4 7.5'/>",
+ hour:"<path d='M6 3h12M6 21h12M7 3v4l5 5-5 5v4M17 3v4l-5 5 5 5v4'/>",
+ bolt:"<path d='M13 2L4 14h7l-1 8 9-12h-7l1-8z'/>",
+ gauge:"<path d='M4 18a8 8 0 1 1 16 0'/><path d='M12 18l4-6'/>",
+ flame:"<path d='M12 2c1 4 5 5 5 10a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-5 1-9z'/>",
+ moon:"<path d='M20 14.5A8 8 0 1 1 9.5 4 6.5 6.5 0 0 0 20 14.5z'/>",
+ sun:"<circle cx='12' cy='12' r='4'/><path d='M12 4V2M12 22v-2M4 12H2M22 12h-2M5.6 5.6L4.2 4.2M19.8 19.8l-1.4-1.4M5.6 18.4l-1.4 1.4M19.8 4.2l-1.4 1.4'/>",
+ trophy:"<path d='M8 4h8v5a4 4 0 0 1-8 0V4zM8 6H4v1a3 3 0 0 0 4 3M16 6h4v1a3 3 0 0 1-4 3M12 13v4M8 21h8M10 17h4'/>",
+ book:"<path d='M5 4h10a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3V4zM5 17a3 3 0 0 1 3-3h10'/>",
+ crown:"<path d='M3 18l2-10 5 4 2-6 2 6 5-4 2 10H3z'/>",
+ star:"<path d='M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9L12 3z'/>",
+ pencil:"<path d='M4 20l1-4L16 5l3 3L8 19l-4 1zM14 7l3 3'/>",
+ pen:"<path d='M12 5v14M5 12h14'/>",
+ user:"<circle cx='12' cy='8' r='4'/><path d='M4 21c0-4 4-6 8-6s8 2 8 6'/>",
+ image:"<path d='M4 5h16v14H4zM4 16l5-5 4 4 3-3 4 4'/><circle cx='8.5' cy='9.5' r='1.5'/>",
+ music:"<path d='M9 18V6l10-2v12'/><circle cx='6.5' cy='18' r='2.5'/><circle cx='16.5' cy='16' r='2.5'/>",
+ compass:"<circle cx='12' cy='12' r='9'/><path d='M15.5 8.5l-2 5-5 2 2-5 5-2z'/>",
+ layers:"<path d='M12 3l9 5-9 5-9-5 9-5zM3 12.5l9 5 9-5'/>",
+ mail:"<path d='M4 6h16v12H4zM4 7l8 6 8-6'/>",
+ pin:"<path d='M12 21s6-5.2 6-10a6 6 0 0 0-12 0c0 4.8 6 10 6 10z'/><circle cx='12' cy='11' r='2'/>",
+ cal:"<path d='M4 6h16v14H4zM4 10h16M8 3v4M16 3v4'/>",
+ tri:"<path d='M12 4l9 16H3L12 4z'/>",
+ diam:"<path d='M12 3l8 9-8 9-8-9 8-9z'/>",
+ grid:"<path d='M4 4h16v16H4zM4 9.3h16M4 14.7h16M9.3 4v16M14.7 4v16'/>",
+ shield:"<path d='M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z'/><path d='M9.5 10l5 5M14.5 10l-5 5'/>"
+};
+const ICONF={solves:'cube',hours:'hour',day:'bolt',dnf:'shield',night:'moon',early:'sun',s3:'bolt',a5:'gauge',a12:'gauge',a100:'gauge',s2:'cube',s4:'grid',sp:'tri',sk:'diam',pbs:'trophy',streak:'flame',days:'cal',algs:'book',notes:'pencil',favs:'star',cus:'pen',prof:'user',bg:'image',snd:'music',cat:'compass',sess:'layers',mail:'mail',pin:'pin'};
+const shade=(h,k)=>'#'+[1,3,5].map(i=>Math.min(255,Math.round(parseInt(h.slice(i,i+2),16)*k)).toString(16).padStart(2,'0')).join('');
+function medal(f,got,sz){
+  const c=got?TCOL[Math.min(got-1,7)]:'#3a3f4d',ic=ICON[ICONF[f.id]||(f.id.indexOf('set_')===0?'crown':'star')],id='mg'+f.id.replace(/\W/g,'')+got+sz;
+  return `<svg class='mdl' viewBox='0 0 48 48' width='${sz}' height='${sz}' aria-hidden='true'><defs><linearGradient id='${id}' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='${shade(c,1.3)}'/><stop offset='1' stop-color='${shade(c,.62)}'/></linearGradient></defs><polygon points='24,2 43,13 43,35 24,46 5,35 5,13' fill='url(#${id})' stroke='rgba(255,255,255,.28)' stroke-width='1.2' stroke-linejoin='round'/>${got?`<polygon points='24,2 43,13 24,25 5,13' fill='rgba(255,255,255,.2)'/>`:''}<g transform='translate(12 12)' fill='none' stroke='${got?'#0b0d12':'#7b8296'}' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round' opacity='.92'>${ic}</g>${got&&sz>=40?`<circle cx='39' cy='41' r='7.5' fill='#11141c' stroke='${c}' stroke-width='1.4'/><text x='39' y='44' text-anchor='middle' font-size='8.5' font-weight='700' fill='${c}' font-family='Manrope,sans-serif'>${ROM[Math.min(got-1,9)]}</text>`:''}</svg>`;
+}
+function lvlBadge(lv,sz){
+  const a=S.profile.accent||'#a9bcff',b=S.profile.grad&&S.profile.ac2?S.profile.ac2:a;
+  return `<svg class='mdl' viewBox='0 0 48 48' width='${sz}' height='${sz}' aria-hidden='true'><defs><linearGradient id='lvg${sz}' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='${a}'/><stop offset='1' stop-color='${b}'/></linearGradient></defs><polygon points='24,2 43,13 43,35 24,46 5,35 5,13' fill='url(#lvg${sz})' stroke='rgba(255,255,255,.3)' stroke-width='1.2'/><polygon points='24,2 43,13 24,25 5,13' fill='rgba(255,255,255,.2)'/><text x='24' y='30' text-anchor='middle' font-size='${lv>99?13:17}' font-weight='800' fill='#0b0d12' font-family='Manrope,sans-serif'>${lv}</text></svg>`;
+}
+function funCtx(){
+  const T=S.times,ok=T.filter(t=>t.pen!=='dnf'),v=ok.map(val);
+  let mv=0;const first={},wd=Array(7).fill(0),hr=Array(24).fill(0);
+  T.forEach(t=>{const tk=(t.scr||'').split(' ').filter(Boolean);mv+=tk.length;if(tk[0])first[tk[0][0]]=(first[tk[0][0]]||0)+1;const d=new Date(t.d||0);wd[d.getDay()]++;hr[d.getHours()]++});
+  let nd=0,ndb=0;T.forEach(t=>{if(t.pen==='dnf')nd=0;else{nd++;if(nd>ndb)ndb=nd}});
+  const med=v.length?[...v].sort((a,b)=>a-b)[v.length>>1]:null;let hs=0,hb=0;ok.forEach(t=>{if(val(t)<=med){hs++;if(hs>hb)hb=hs}else hs=0});
+  let pal=0,rep=0;ok.forEach(t=>{const s=String(Math.floor(val(t)/10));if(s.length>=3&&s===[...s].reverse().join(''))pal++;if(s.length>=3&&[...s].every(c=>c===s[0]))rep++});
+  const cat=S.cats.map(c=>[c,ok.filter(t=>t.ev===c.id)]).sort((a,b)=>b[1].length-a[1].length)[0],a=cat?cat[1]:[];
+  const aw=(i,n)=>{const w=a.slice(i-n+1,i+1).map(val).sort((x,y)=>x-y).slice(1,-1);return w.reduce((p,q)=>p+q,0)/w.length};
+  let b5=null,b12=null;for(let i=4;i<a.length;i++){const x=aw(i,5);if(b5==null||x<b5)b5=x;if(i>=11){const y=aw(i,12);if(b12==null||y<b12)b12=y}}
+  const mean=l=>l.reduce((p,q)=>p+q,0)/l.length,l100=a.slice(-100).map(val);
+  const imp=a.length>=100?(mean(a.slice(0,50).map(val))-mean(a.slice(-50).map(val)))/mean(a.slice(0,50).map(val)):null;
+  const sd=l100.length>=5?Math.sqrt(mean(l100.map(x=>(x-mean(l100))**2))):null;
+  let fast=null,slow=null;ok.forEach(t=>{if(!fast||val(t)<val(fast))fast=t;if(!slow||val(t)>val(slow))slow=t});
+  const hist=[];if(a.length>=10){const vs=a.map(val),lo=Math.min(...vs),hi=Math.max(...vs),w=(hi-lo)/10||1;for(let i=0;i<10;i++)hist.push({lo:lo+i*w,n:0});vs.forEach(x=>{hist[Math.min(9,Math.floor((x-lo)/w))].n++})}
+  return{mv,first,wd,hr,ndb,hb,med,pal,rep,b5,b12,imp,sd,fast,slow,hist,cat:cat&&cat[0],p2:T.filter(t=>t.pen===2).length,tot:T.length};
+}
 function achHTML(){
   const ctx=achCtx(),au=S.profile.au||{},T=achTotals(ctx,au),pin=S.profile.pin||[],cats=['All',...new Set(getAF().map(f=>f.cat))];
-  let h=`<div class='row'><span><b>Level ${T.lv}</b><br><small class='md'>${T.u} of ${T.tot} unlocked \u00b7 ${T.pts} points</small></span></div><div class='pbar'><i style='width:${T.pct}%'></i></div><div class='chips' id='acf' style='margin-top:12px'>${cats.map(c=>`<button class='${c===acCat?'on':''}' data-c='${c}'>${c}</button>`).join('')}</div>`;
+  let h=`<div class='lvl'>${lvlBadge(T.lv,56)}<div><b>Level ${T.lv}</b><br><small class='md'>${T.u} of ${T.tot} unlocked \u00b7 ${T.pts} points \u00b7 ${T.hi-T.pts} to next level</small></div></div><div class='pbar'><i style='width:${T.pct}%'></i></div><div class='chips' id='acf' style='margin-top:12px'>${cats.map(c=>`<button class='${c===acCat?'on':''}' data-c='${c}'>${c}</button>`).join('')}</div>`;
   getAF().filter(f=>acCat==='All'||f.cat===acCat).forEach(f=>{
     const cur=f.v(ctx),n=f.tiers.length;let got=0;f.tiers.forEach((t,i)=>{if(au[f.id+':'+i])got=i+1});
     const nxt=got<n?f.tiers[got]:null,pct=nxt==null?100:f.less?(cur==null||cur<=0?0:Math.min(100,Math.round(nxt/cur*100))):Math.min(100,Math.round((cur||0)/nxt*100));
     const vt=nxt==null?'Complete':f.less?(cur==null?'No time yet':'Best '+fs2(cur)+' \u00b7 next: under '+nxt+'s'):(f.u==='h'?(cur||0).toFixed(1):Math.floor(cur||0))+' / '+nxt+(f.u?' '+f.u:'');
-    h+=`<div class='ach'><div class='med ${got?'':'lk'}' style='${got?'background:'+TCOL[Math.min(got-1,7)]:''}'>${got?ROM[Math.min(got-1,9)]:'\u2013'}</div><div><b>${esc(f.n)}</b><div class='md'>${esc(nxt!=null?f.d(nxt):'All tiers complete')}</div><div class='pbar'><i style='width:${pct}%'></i></div><small class='md'>${esc(vt)}</small><div class='tdots'>${f.tiers.map((t,i)=>`<i style='${i<got?'background:'+TCOL[Math.min(i,7)]:''}'></i>`).join('')}</div></div><button class='star ${pin.includes(f.id)?'on':''}' data-pin='${f.id}' ${got?'':'disabled'} aria-label='Pin to profile' title='Pin to profile'>\u2605</button></div>`});
+    h+=`<div class='ach ${got?'':'lkd'}'>${medal(f,got,54)}<div><b>${esc(f.n)}</b><div class='md'>${esc(nxt!=null?f.d(nxt):'All tiers complete')}</div><div class='pbar'><i style='width:${pct}%'></i></div><small class='md'>${esc(vt)}</small><div class='tdots'>${f.tiers.map((t,i)=>`<i style='${i<got?'background:'+TCOL[Math.min(i,7)]:''}'></i>`).join('')}</div></div><button class='star ${pin.includes(f.id)?'on':''}' data-pin='${f.id}' ${got?'':'disabled'} aria-label='Pin to profile' title='Pin to profile'>\u2605</button></div>`});
   return h;
 }
 function statHTML(){
-  const c=achCtx(),cards=[['Solves',c.nOK],['Time solving',c.hrs>=1?c.hrs.toFixed(1)+' h':Math.round(c.hrs*60)+' min'],['Active days',c.nd],['Current streak',c.cur+' d'],['Longest streak',c.lg+' d'],['PB singles',c.pbs],['Best day',c.maxDay],['DNFs',c.dnf]];
+  const c=achCtx(),F=funCtx(),cards=[['Solves',c.nOK],['Time solving',c.hrs>=1?c.hrs.toFixed(1)+' h':Math.round(c.hrs*60)+' min'],['Active days',c.nd],['Current streak',c.cur+' d'],['Longest streak',c.lg+' d'],['PB singles',c.pbs],['Best day',c.maxDay],['DNFs',c.dnf]];
+  const DN=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],mx=a=>a.indexOf(Math.max(...a)),has=F.tot>0;
+  const mins=c.hrs*60,hh=h=>(h%12||12)+(h<12?' am':' pm'),opener=Object.entries(F.first).sort((a,b)=>b[1]-a[1])[0];
+  const fun=[
+    ['Time on the cube',mins>=60?c.hrs.toFixed(1)+' h':Math.round(mins)+' min',has?`about ${(mins/22).toFixed(1)} sitcom episodes`:'Start solving'],
+    ['Scramble moves',F.mv.toLocaleString(),opener?`favorite opener: ${opener[0]} (${opener[1]}x)`:'turned just to mix it up'],
+    ['Lucky solves',F.pal+F.rep,`${F.pal} palindromes like 12.21, ${F.rep} repeating like 11.11`],
+    ['Hot streak',F.hb,'solves in a row at or under your median'],
+    ['Clean streak',F.ndb,'solves in a row without a DNF'],
+    ['Improvement',F.imp==null?'\u2013':(F.imp>=0?'-':'+')+Math.abs(F.imp*100).toFixed(1)+'%',F.imp==null?'needs 100 solves in one category':'first 50 solves vs your latest 50'],
+    ['Consistency',F.sd==null?'\u2013':'\u00b1'+(F.sd/1000).toFixed(2)+'s',F.sd==null?'needs 5 solves':'spread of your last 100'],
+    ['Best Ao5 ever',F.b5==null?'\u2013':fmt(F.b5),F.cat?`in ${F.cat.name}, rolling through history`:''],
+    ['Best Ao12 ever',F.b12==null?'\u2013':fmt(F.b12),F.cat?`in ${F.cat.name}, rolling through history`:''],
+    ['Favorite day',has?DN[mx(F.wd)]:'\u2013',has?`${Math.max(...F.wd)} solves`:''],
+    ['Favorite hour',has?hh(mx(F.hr)):'\u2013',has?`${Math.max(...F.hr)} solves`:''],
+    ['Median solve',F.med==null?'\u2013':fmt(F.med),'the middle of all your times'],
+    ['Fastest solve',F.fast?fmt(val(F.fast)):'\u2013',F.fast&&F.fast.d?new Date(F.fast.d).toLocaleDateString():''],
+    ['Slowest solve',F.slow?fmt(val(F.slow)):'\u2013',F.slow&&F.slow.d?new Date(F.slow.d).toLocaleDateString():''],
+    ['Penalties',F.p2+c.dnf,`${F.p2} x +2, ${c.dnf} DNF${F.tot?` (${(c.dnf/F.tot*100).toFixed(1)}% DNF rate)`:''}`],
+    ['Per active day',c.nd?(F.tot/c.nd).toFixed(1):'\u2013','solves on the days you solve']
+  ];
+  const bars=(arr,labs)=>{const m=Math.max(1,...arr);return `<div class='bars'>${arr.map((n,i)=>`<div style='height:${Math.max(3,n/m*100)}%' title='${labs[i]}: ${n}'></div>`).join('')}</div>`};
   const rows=S.cats.map(k=>{const p=c.per[k.id]||{},pb=S.pb[k.id]||{};return `<tr><td>${esc(k.name)}</td><td>${p.n||0}</td><td>${fmt(p.best<Infinity?p.best:null)}</td><td>${fmt(pb.ao5)}</td><td>${fmt(pb.ao12)}</td><td>${fmt(p.mean)}</td></tr>`}).join('');
+  const total=Math.max(1,S.cats.reduce((n,k)=>n+((c.per[k.id]||{}).n||0),0)),share=S.cats.filter(k=>(c.per[k.id]||{}).n).map(k=>{const n=c.per[k.id].n;return `<div class='tl'><span>${esc(k.name)}</span><small class='md'>${n} \u00b7 ${Math.round(n/total*100)}%</small></div><div class='pbar' style='margin:0 0 6px'><i style='width:${n/total*100}%'></i></div>`}).join('');
   const wd=new Date().getDay(),start=c.today-wd-7*17,ac=S.profile.accent||'#a9bcff';let hm='';
   for(let i=0;i<126;i++){const d=start+i,n=c.days[d]||0,a=d>c.today?0:n?[.3,.5,.75,1][n>=30?3:n>=15?2:n>=5?1:0]:.07;hm+=`<i style='background:${d>c.today?'transparent':n?ac:'rgba(255,255,255,.06)'};${n?'opacity:'+a:''}' title='${n} solves'></i>`}
   const tl=c.pbev.slice(-8).reverse().map(e=>`<div class='tl'><span>${esc(catOf(e.ev).name)}</span><b>${fmt(e.ms)}</b><small class='md'>${e.d?new Date(e.d).toLocaleDateString():''}</small></div>`).join('');
-  return `<div class='sg'>${cards.map(([l,v])=>`<div><b>${v}</b><small>${l}</small></div>`).join('')}</div><h3>By category</h3><div style='overflow-x:auto'><table class='tbl'><tr><th>Category</th><th>Solves</th><th>Best</th><th>Ao5 PB</th><th>Ao12 PB</th><th>Mean 100</th></tr>${rows}</table></div><h3>Activity, last 18 weeks</h3><div class='heat'>${hm}</div><h3>Recent personal bests</h3>${tl||`<p class='empty'>Beat your best time to start your PB timeline.</p>`}`;
+  const hist=F.hist.length?`<h3>Your time spread \u00b7 ${esc(F.cat.name)}</h3>${bars(F.hist.map(x=>x.n),F.hist.map(x=>fmt(x.lo)))}<div class='bl'><span style='text-align:left'>${fmt(F.hist[0].lo)}</span><span style='text-align:right'>${fmt(F.hist[9].lo)}</span></div>`:'';
+  return `<div class='sg'>${cards.map(([l,v])=>`<div><b>${v}</b><small>${l}</small></div>`).join('')}</div><h3>Fun facts</h3><div class='sg'>${fun.map(([l,v,s])=>`<div><small>${l}</small><b>${v}</b><small>${esc(s)}</small></div>`).join('')}</div><h3>Solves by weekday</h3>${bars(F.wd,DN)}<div class='bl'>${['S','M','T','W','T','F','S'].map(x=>`<span>${x}</span>`).join('')}</div><h3>Solves by hour</h3>${bars(F.hr,F.hr.map((x,i)=>hh(i)))}<div class='bl'>${F.hr.map((x,i)=>`<span>${i%6===0?hh(i):''}</span>`).join('')}</div>${hist}<h3>Share by category</h3>${share||`<p class='empty'>No solves yet.</p>`}<h3>By category</h3><div style='overflow-x:auto'><table class='tbl'><tr><th>Category</th><th>Solves</th><th>Best</th><th>Ao5 PB</th><th>Ao12 PB</th><th>Mean 100</th></tr>${rows}</table></div><h3>Activity, last 18 weeks</h3><div class='heat'>${hm}</div><h3>Recent personal bests</h3>${tl||`<p class='empty'>Beat your best time to start your PB timeline.</p>`}`;
 }
 function renderAch(){$('#acx').innerHTML=acTab==='a'?achHTML():statHTML();document.querySelectorAll('#act button').forEach(b=>b.classList.toggle('on',b.dataset.t===acTab))}
 function openAch(tab){acTab=tab||'a';renderAch();openSheet('#sh-ac')}
@@ -1225,12 +1309,12 @@ const _rp3=renderP;
 renderP=function(){_rp3();try{achInject()}catch(e){}};
 function achInject(){
   const pc=$('#pc'),ctx=achCtx(),au=S.profile.au||{},T=achTotals(ctx,au),pin=S.profile.pin||[],AFs=getAF();
-  const show=pin.map(id=>{const f=AFs.find(x=>x.id===id);if(!f)return'';let got=0;f.tiers.forEach((t,i)=>{if(au[f.id+':'+i])got=i+1});return got?`<span><i class='med' style='background:${TCOL[Math.min(got-1,7)]}'>${ROM[Math.min(got-1,9)]}</i>${esc(f.n)}</span>`:''}).join('');
+  const show=pin.map(id=>{const f=AFs.find(x=>x.id===id);if(!f)return'';let got=0;f.tiers.forEach((t,i)=>{if(au[f.id+':'+i])got=i+1});return got?`<span>${medal(f,got,30)}${esc(f.n)}</span>`:''}).join('');
   const first=pc.querySelector('.bd,.pg,h3');
   if(show&&first)first.insertAdjacentHTML('beforebegin',`<div class='show'>${show}</div>`);
-  const recent=Object.entries(au).filter(([k,t])=>t>1).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k])=>{const [id,i]=k.split(':'),f=AFs.find(x=>x.id===id);return f?`<span><i class='med' style='background:${TCOL[Math.min(+i,7)]}'>${ROM[Math.min(+i,9)]}</i>${esc(f.n)}</span>`:''}).join('');
+  const recent=Object.entries(au).filter(([k,t])=>t>1).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k])=>{const [id,i]=k.split(':'),f=AFs.find(x=>x.id===id);return f?`<span>${medal(f,+i+1,30)}${esc(f.n)}</span>`:''}).join('');
   const acct=[...pc.querySelectorAll('h3')].find(x=>x.textContent==='Account');
-  if(acct)acct.insertAdjacentHTML('beforebegin',`<h3>Achievements</h3><div class='row'><span><b>Level ${T.lv}</b><br><small class='md'>${T.u} of ${T.tot} unlocked \u00b7 ${T.pts} points</small></span><button class='btn' data-p='ach'>View all</button></div><div class='pbar'><i style='width:${T.pct}%'></i></div>${recent?`<div class='show'>${recent}</div>`:''}<div class='ft' style='margin-top:10px'><button class='btn' data-p='stt'>Full statistics</button></div>`);
+  if(acct)acct.insertAdjacentHTML('beforebegin',`<h3>Achievements</h3><div class='lvl'>${lvlBadge(T.lv,48)}<div><b>Level ${T.lv}</b><br><small class='md'>${T.u} of ${T.tot} unlocked \u00b7 ${T.pts} points</small></div><button class='btn' data-p='ach' style='margin-left:auto'>View all</button></div><div class='pbar'><i style='width:${T.pct}%'></i></div>${recent?`<div class='show'>${recent}</div>`:''}<div class='ft' style='margin-top:10px'><button class='btn' data-p='stt'>Full statistics</button></div>`);
 }
 $('#pc').addEventListener('click',e=>{const b=e.target.closest('[data-p]');if(!b)return;if(b.dataset.p==='ach')openAch('a');else if(b.dataset.p==='stt')openAch('s')});
 achSoon();
