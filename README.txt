@@ -4,3 +4,4 @@ Aurel installable app (PWA)
 3. After the first load it works offline. Your solves, backgrounds and sounds stay on the device.
 
 Algorithm data: HCubist (hcubist.com/learn) by Hitesh Kumar Bhuwalka. Keep the credit if you share this site.
+
